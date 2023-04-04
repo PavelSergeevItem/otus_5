@@ -1,4 +1,4 @@
-***Стенд Vagrant с NFS***  
+**Стенд Vagrant с NFS**  
 
 **1. Описание задания**  
 
@@ -10,4 +10,51 @@
 - firewall должен быть включен и настроен как на клиенте, так и на сервере.  
 
 **2. Выполенение задания.**
+
+**Настройка сервера.**  
+
+1. Создал виртуальную машину основываясь на примере указанным в методичке. Создал вагрантфайл, запустил его командой ``vagrant up``. Подключился к виртуальной машине командой ``vagrant ssh nfss``. Получил корневой доступ ``sudo -i``
+2. Установил утилиты нужные для работы с NFS при помощи комады ``yum install nfs-utils``.  
+3. Включил фаервол и проврели, что он работает. Команды использовал приведенные ниже. 
+```
+systemctl enable firewalld --now
+firewall-cmd --add-service="nfs3" \
+--add-service="rpc-bind" \
+--add-service="mountd" \
+--permanent 
+firewall-cmd --reload
+```
+4. Включил сервер NFS. `` systemctl enable nfs --now ``
+5. Создал и настроил директори, нужную для обмена файлами в будущем.
+```
+mkdir -p /srv/share/upload 
+chown -R nfsnobody:nfsnobody /srv/share 
+chmod 0777 /srv/share/upload 
+```
+6. Создал в файле /etc/exports/ стуруктуру, котрая позволит использовать папку, которую созадал выше.
+`` cat << EOF > /etc/exports /srv/share 192.168.50.11/32(rw,sync,root_squash)EOF``
+7. Экспортировал ранее сделанную папку ``exportfs -r``
+8. Проверил экспорт ``exportfs -s``
+
+**Настройка клиента**  
+
+1. Подключился к виртуальной машине командой ``vagrant ssh nfsс``. Получил корневой доступ ``sudo -i``
+2. Установли утилиты для работы NFS: ``yum install nfs-utils ``.
+3. Включил фаервол: ``systemctl enable firewalld --now``.
+4. Добавил файл: ``/etc/fstab строку ``echo "192.168.56.10:/srv/share/ /mnt nfs vers=3,proto=udp,noauto,x-systemd.automount 0 0" >> /etc/fstab``
+5. Выполнил команды:
+```
+systemctl daemon-reload 
+systemctl restart remote-fs.target 
+```
+
+**Созадние автоматизированного Vagranfile**
+
+1. Основываясь на методичке создал Vagrantfile.
+2. Основываяь на методичке создал и положил в папку с вагрант проектом скрипт для автоматической настройки сервера, с названием nfss_script.sh: `` sudo nano nfss_script.sh``.
+3. Основываяь на методичке создал и положил в папку с вагрант проектом скрипт для автоматической настройки сервера, с названием nfsс_script.sh: `` sudo nano nfsc_script.sh``.
+4. Проверил развертывание двух виртуальных машин. 
+5. Создал репозиторий, написал Readme, залил в репозиторий Vagrantfile, два скрипта: nfss_script.sh, nfsc_script.sh.
+
+
 
