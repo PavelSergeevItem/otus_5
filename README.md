@@ -40,7 +40,7 @@ chmod 0777 /srv/share/upload
 1. Подключился к виртуальной машине командой: ``vagrant ssh nfsс``. Получил корневой доступ: ``sudo -i``.
 2. Установли утилиты для работы NFS: ``yum install nfs-utils ``.
 3. Включил фаервол: ``systemctl enable firewalld --now``.
-4. Добавил файл: ``/etc/fstab строку ``echo "192.168.56.10:/srv/share/ /mnt nfs vers=3,proto=udp,noauto,x-systemd.automount 0 0" >> /etc/fstab``
+4. Добавил файл: ``/etc/fstab строку ``echo "192.168.50.10:/srv/share/ /mnt nfs vers=3,proto=udp,noauto,x-systemd.automount 0 0" >> /etc/fstab``
 5. Выполнил команды:
 ```
 systemctl daemon-reload 
